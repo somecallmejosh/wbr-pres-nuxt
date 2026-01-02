@@ -26,6 +26,7 @@ const { data: gallery, refresh } = await useAsyncData('gallery', async () => {
 // Cloudinary widget
 const cloudinaryLoaded = ref(false)
 let widget = null
+const pendingUploads = ref([])
 
 // Load Cloudinary script
 onMounted(() => {
@@ -88,20 +89,35 @@ async function openUploadWidget() {
         }
       },
       async (error, result) => {
-        if (!error && result && result.event === 'success') {
-          console.log('Upload successful:', result.info)
+        if (!error && result) {
+          if (result.event === 'success') {
+            console.log('Upload successful:', result.info)
+            // Buffer uploads to insert in one batch to avoid duplicate positions
+            pendingUploads.value.push(result.info)
+          }
 
-          // Save to Supabase
-          const nextPosition = (gallery.value?.gallery_images?.length || 0) + 1
-          await client.from('gallery_images').insert({
-            gallery_id: route.params.id,
-            cloudinary_id: result.info.public_id,
-            url: result.info.secure_url,
-            position: nextPosition
-          })
-
-          // Refresh gallery
-          await refresh()
+          // When all uploads complete or widget closes, persist buffered rows
+          if (result.event === 'queues-end' || result.event === 'close') {
+            if (pendingUploads.value.length) {
+              const base = (gallery.value?.gallery_images?.length || 0)
+              const rows = pendingUploads.value.map((info, idx) => ({
+                gallery_id: route.params.id,
+                cloudinary_id: info.public_id,
+                url: info.secure_url,
+                position: base + idx + 1
+              }))
+              const { error: insertError } = await client.from('gallery_images').insert(rows)
+              if (insertError) {
+                console.error('Failed to save uploaded images:', insertError)
+                toast.add({ title: 'Upload save failed', description: insertError.message || 'Failed to save uploaded images', color: 'error' })
+              } else {
+                await refresh()
+                toast.add({ title: 'Images added', color: 'success' })
+              }
+              // Clear buffer regardless of outcome
+              pendingUploads.value = []
+            }
+          }
         }
 
         if (error) {
@@ -179,17 +195,43 @@ async function saveOrder() {
 <template>
   <admin-inner-wrapper :title="gallery?.title" description="Manage photos in this gallery" v-if="gallery">
     <!-- Image Grid with Drag-and-Drop -->
-    <Draggable v-model="orderedImages" item-key="id" class="image-grid" handle=".drag-handle" @end="saveOrder">
-      <template #item="{ element }">
-        <div class="image-card">
-          <div class="drag-handle" title="Drag to reorder">⋮⋮</div>
-          <img :src="element.url" :alt="gallery.title">
-          <UButton @click="deleteImage(element)" color="error" class="absolute top-2 right-2">
-            Remove
-          </UButton>
-        </div>
-      </template>
-    </Draggable>
+
+    <UCard>
+      <UAlert icon="mdi-information" variant="subtle" class="mb-8">
+        <template #title><p><strong>Drag and drop images to reorder them.</strong></p></template>
+        <template #description>
+          <p><strong>After reordering, the new order will be saved automatically.</strong></p>
+        </template>
+      </UAlert>
+      <Draggable v-model="orderedImages" item-key="id" handle=".drag-handle" @end="saveOrder"
+        class="divide-y divide-gray-200 bg-white">
+        <template #item="{ element }">
+          <div class="flex gap-4 p-2 items-center bg-white">
+            <div class="drag-handle cursor-move" title="Drag to reorder">
+              <Icon name="mdi-drag" size="2rem" />
+            </div>
+            <div>
+              <output class="size-8 flex items-center justify-center rounded-full bg-gray-200 font-bold"><span
+                  class="sr-only">Position: </span>{{ element.position }}</output>
+            </div>
+            <div>
+              <div class="drag-handle aspect-square w-28 relative cursor-move" title="Drag to reorder">
+                <img :src="element.url" :alt="gallery.title" class="object-cover w-full aspect-square rounded" />
+              </div>
+            </div>
+            <div class="flex-1">
+              <p class="font-medium">{{ element.cloudinary_id }}</p>
+              <p class="text-sm">{{ element.url }}</p>
+            </div>
+            <div>
+              <UButton @click="deleteImage(element)" color="error">
+                Remove
+              </UButton>
+            </div>
+          </div>
+        </template>
+      </Draggable>
+    </UCard>
 
     <div class="space-y-2">
       <UEmpty v-if="!gallery?.gallery_images?.length" title="No images in this gallery yet."
@@ -204,56 +246,7 @@ async function saveOrder() {
 </template>
 
 <style scoped>
-.upload-btn {
-  background: #0078FF;
-  color: white;
-  border: none;
-  padding: 12px 24px;
-  border-radius: 8px;
-  cursor: pointer;
-  font-size: 16px;
-  margin: 20px 0;
-}
-
-.upload-btn:hover {
-  background: #0056CC;
-}
-
-.upload-btn:disabled {
-  background: #ccc;
-  cursor: not-allowed;
-}
-
-.image-grid {
-  display: grid;
-  grid-template-columns: repeat(auto-fill, minmax(250px, 1fr));
-  gap: 20px;
-  margin-top: 30px;
-}
-
-.image-card {
-  position: relative;
-  border-radius: 8px;
-  overflow: hidden;
-  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
-}
-
-.image-card img {
-  width: 100%;
-  height: 250px;
-  object-fit: cover;
-  display: block;
-}
-
-.drag-handle {
-  position: absolute;
-  left: 10px;
-  top: 10px;
-  cursor: grab;
-  background: rgba(0, 0, 0, 0.4);
-  color: #fff;
-  padding: 4px 8px;
-  border-radius: 4px;
-  font-weight: 700;
+.sortable-ghost {
+  border: 2px dashed var(--color-sky-500); /* Tailwind slate-400 */
 }
 </style>
