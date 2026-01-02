@@ -20,8 +20,4 @@ const cards = ref([
   }
 ])
 </script>
-<template>
-  <UPageCard>
-    Admin Page
-  </UPageCard>
-</template>
+<template></template>

@@ -1,8 +1,8 @@
 <template>
-  <UPageCard>
+  <div>
     <EventList />
     <div>
       <UButton href="/admin/events/create">Create New Event</UButton>
     </div>
-  </UPageCard>
+  </div>
 </template>

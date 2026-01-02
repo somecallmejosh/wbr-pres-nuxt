@@ -23,9 +23,9 @@ onMounted(async () => {
 
 
 <template>
-  <UPageCard v-if="event">
+  <div v-if="event">
     <h1 class="font-semibold text-xl">{{ event?.title }}</h1>
     <p>{{ event?.description }}</p>
     <p>{{ new Date(event?.date).toLocaleDateString() }}</p>
-  </UPageCard>
+  </div>
 </template>

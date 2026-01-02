@@ -138,16 +138,17 @@ async function deleteImage(image) {
 
 <template>
   <div>
-    <h1>{{ gallery?.title }}</h1>
-
-    <!-- Upload Button -->
-    <button
-      @click="openUploadWidget"
-      :disabled="!cloudinaryLoaded"
-      class="upload-btn"
-    >
-      {{ cloudinaryLoaded ? 'Upload Images' : 'Loading...' }}
-    </button>
+    <div class="flex items-center justify-between mb-4">
+      <h1 class="text-2xl font-semibold">{{ gallery?.title }}</h1>
+      <!-- Upload Button -->
+      <UButton
+        @click="openUploadWidget"
+        :disabled="!cloudinaryLoaded"
+        class="upload-btn"
+      >
+        {{ cloudinaryLoaded ? 'Upload Images' : 'Loading...' }}
+      </UButton>
+    </div>
 
     <!-- Image Grid -->
     <div class="image-grid">

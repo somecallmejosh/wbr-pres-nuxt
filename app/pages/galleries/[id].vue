@@ -41,9 +41,12 @@ function closeLightbox() {
     <UPageCard>
       <header>
         <h1>{{ gallery.title }}</h1>
-        <ULink to="/galleries">
+        <UButton to="/galleries">
           ← All Galleries
-        </ULink>
+        </UButton>
+        <UButton :to="`/admin/galleries/${gallery.id}`">
+          Edit this Gallery
+        </UButton>
       </header>
       <!-- Image Grid -->
       <div v-if="gallery.gallery_images?.length" class="image-grid">

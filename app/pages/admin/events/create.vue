@@ -43,7 +43,7 @@ async function onSubmit(event: FormSubmitEvent<Schema>) {
 </script>
 
 <template>
-  <UPageCard>
+  <div>
     <h2 class="font-semibold">Create a New Event</h2>
     <UForm :validate="validate" :state="state" class="space-y-4" @submit="onSubmit">
       <UFormField label="Title" name="title">
@@ -59,5 +59,5 @@ async function onSubmit(event: FormSubmitEvent<Schema>) {
         Submit
       </UButton>
     </UForm>
-  </UPageCard>
+  </div>
 </template>
