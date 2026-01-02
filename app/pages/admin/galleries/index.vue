@@ -1,5 +1,6 @@
 <script setup lang="ts">
 import type { FormError, FormSubmitEvent } from '@nuxt/ui'
+import admin from '~/middleware/admin'
 const client = useSupabaseClient()
 
 const state = reactive({
@@ -35,19 +36,22 @@ async function onSubmit(event: FormSubmitEvent<Schema>) {
 </script>
 
 <template>
-  <UPageCard>
-    <h2 class="font-semibold">Create a New Gallery</h2>
+  <admin-inner-wrapper title="Galleries" description="Manage photo galleries for WBR Presbyterian Church.">
     <GalleriesList />
-    <UForm :validate="validate" :state="state" class="space-y-4" @submit="onSubmit">
-      <UFormField
-        label="Title of the Gallery" name="title"
-        description="You will be able to add photos to the gallery after creating it."
-      >
-        <UInput v-model="state.title" />
-      </UFormField>
-      <UButton type="submit">
-        Create Gallery
-      </UButton>
-    </UForm>
-  </UPageCard>
+
+    <UCard>
+      <h2 class="font-semibold">Create a New Gallery</h2>
+      <UForm :validate="validate" :state="state" class="space-y-4" @submit="onSubmit">
+        <UFormField
+          label="Title of the Gallery" name="title"
+          help="You will be able to add photos to the gallery after creating it."
+        >
+          <UInput v-model="state.title" />
+        </UFormField>
+        <UButton type="submit">
+          Create Gallery
+        </UButton>
+      </UForm>
+    </UCard>
+  </admin-inner-wrapper>
 </template>

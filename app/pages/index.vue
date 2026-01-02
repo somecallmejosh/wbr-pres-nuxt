@@ -1,6 +1,6 @@
 <template>
-  <div>
+  <page-wrapper>
     <UPageHero title="Home" />
     <MembersList />
-  </div>
+  </page-wrapper>
 </template>

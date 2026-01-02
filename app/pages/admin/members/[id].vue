@@ -18,13 +18,19 @@ onMounted(async () => {
   const fetchedMember = await getMember(memberId)
   member.value = fetchedMember
 })
+
+const links = [
+  { label: '← All Members', to: '/admin/members' },
+  { label: 'Edit this Member', to: `/admin/members/${memberId}/edit` }
+]
 </script>
 
 
 
 <template>
-  <UPageCard v-if="member">
-    <h1 class="font-semibold text-xl">{{ member?.name }}</h1>
-    <p>{{ new Date(member?.date_of_birth).toLocaleDateString() }}</p>
-  </UPageCard>
+  <admin-inner-wrapper :title="member.name" v-if="member">
+    <p>{{ new Date(member?.birth_date).toLocaleDateString() }}</p>
+
+    <admin-wrapper-links :links="links" />
+  </admin-inner-wrapper>
 </template>

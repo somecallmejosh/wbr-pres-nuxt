@@ -40,11 +40,14 @@ async function onSubmit(event: FormSubmitEvent<Schema>) {
     toast.add({ title: 'Success', description: 'The form has been submitted.', color: 'success' })
   }
 }
+
+const links = [
+  { label: 'Back to Events', to: '/admin/events' }
+]
 </script>
 
 <template>
-  <div>
-    <h2 class="font-semibold">Create a New Event</h2>
+  <admin-inner-wrapper title="Create Event" description="Create a new event for WBR Presbyterian Church.">
     <UForm :validate="validate" :state="state" class="space-y-4" @submit="onSubmit">
       <UFormField label="Title" name="title">
         <UInput v-model="state.title" />
@@ -59,5 +62,6 @@ async function onSubmit(event: FormSubmitEvent<Schema>) {
         Submit
       </UButton>
     </UForm>
-  </div>
+    <admin-wrapper-links :links="links" />
+  </admin-inner-wrapper>
 </template>

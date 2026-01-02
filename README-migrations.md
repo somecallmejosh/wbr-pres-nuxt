@@ -1,0 +1,12 @@
+## Supabase Migrations
+- Purpose: add `position` to `gallery_images` and enable ordered queries.
+- Files:
+  - [supabase/migrations/20260102_add_gallery_images_position.sql](supabase/migrations/20260102_add_gallery_images_position.sql)
+  - [supabase/migrations/20260102_optional_gallery_images_constraints.sql](supabase/migrations/20260102_optional_gallery_images_constraints.sql)
+- How to apply:
+  - Open the Supabase SQL editor for your project.
+  - Paste and run the contents of the required migration first.
+  - Optionally run the constraints migration to enforce uniqueness per gallery.
+- After applying:
+  - Verify the admin reordering page shows images ordered by `position`.
+  - New uploads will be assigned the next `position` automatically by the app.

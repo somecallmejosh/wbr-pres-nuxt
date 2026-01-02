@@ -16,7 +16,5 @@
   ])
 </script>
 <template>
-  <UPageCard>
-    <NuxtPage />
-  </UPageCard>
+  <NuxtPage />
 </template>

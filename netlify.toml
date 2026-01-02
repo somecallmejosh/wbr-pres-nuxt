@@ -2,9 +2,3 @@
 directory = "netlify/functions"
 # Use esbuild to bundle functions for faster cold starts
 node_bundler = "esbuild"
-
-# Optional: keep functions from being affected by redirects
-[[redirects]]
-  from = "/.netlify/functions/*"
-  to = "/.netlify/functions/:splat"
-  status = 200

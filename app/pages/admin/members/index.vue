@@ -39,19 +39,21 @@ async function onSubmit(event: FormSubmitEvent<Schema>) {
 </script>
 
 <template>
-  <UPageCard>
+  <admin-inner-wrapper title="Members" description="Manage church members at WBR Presbyterian Church.">
     <MembersList />
-    <UForm :validate="validate" :state="state" class="space-y-4" @submit="onSubmit">
-      <h1 class="font-semibold text-2xl">Add New Church Member</h1>
-      <UFormField label="Church Member Name" name="name">
-        <UInput v-model="state.name" />
-      </UFormField>
-      <UFormField label="Birth Day" name="birth_date">
-        <UInput v-model="state.birth_date" type="date" />
-      </UFormField>
-      <UButton type="submit">
-        Submit
-      </UButton>
-    </UForm>
-  </UPageCard>
+    <UCard>
+      <UForm :validate="validate" :state="state" class="space-y-4" @submit="onSubmit">
+        <h1 class="font-semibold text-2xl">Add New Church Member</h1>
+        <UFormField label="Church Member Name" name="name">
+          <UInput v-model="state.name" />
+        </UFormField>
+        <UFormField label="Birth Day" name="birth_date">
+          <UInput v-model="state.birth_date" type="date" />
+        </UFormField>
+        <UButton type="submit">
+          Submit
+        </UButton>
+      </UForm>
+    </UCard>
+  </admin-inner-wrapper>
 </template>

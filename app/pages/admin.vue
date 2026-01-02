@@ -24,13 +24,10 @@ const cards = ref([
 ])
 </script>
 <template>
-  <UPageSection>
-    <UPageHeader title="Admin">
-      <p>Manage your admin settings here.</p>
-    </UPageHeader>
+  <page-wrapper title="Admin" description="Manage your admin settings here.">
     <NuxtPage />
     <UPageGrid>
       <UPageCard v-for="(card, index) in cards" :key="index" v-bind="card" />
     </UPageGrid>
-  </UPageSection>
+  </page-wrapper>
 </template>

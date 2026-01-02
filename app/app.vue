@@ -41,7 +41,7 @@ const items = [
   <UApp>
     <UHeader>
       <template #title>
-        WBR Presbyterian Church
+        <div>WBR Presbyterian Church</div>
       </template>
       <UNavigationMenu :items="items" />
       <template #right>
@@ -55,7 +55,7 @@ const items = [
         </UButton>
       </template>
       <template #body>
-        <UNavigationMenu :items="items" orientation="vertical" class="-mx-2.5" />
+        <UNavigationMenu :items="items" orientation="vertical" />
       </template>
     </UHeader>
     <UMain>

@@ -1,4 +1,5 @@
 <script setup>
+import Draggable from 'vuedraggable'
 definePageMeta({
   middleware: 'admin'
 })
@@ -6,6 +7,7 @@ definePageMeta({
 const route = useRoute()
 const client = useSupabaseClient()
 const config = useRuntimeConfig()
+const toast = useToast()
 
 // Fetch gallery with images
 const { data: gallery, refresh } = await useAsyncData('gallery', async () => {
@@ -16,6 +18,7 @@ const { data: gallery, refresh } = await useAsyncData('gallery', async () => {
       gallery_images (*)
     `)
     .eq('id', route.params.id)
+    .order('position', { foreignTable: 'gallery_images', ascending: true })
     .single()
   return data
 })
@@ -89,10 +92,12 @@ async function openUploadWidget() {
           console.log('Upload successful:', result.info)
 
           // Save to Supabase
+          const nextPosition = (gallery.value?.gallery_images?.length || 0) + 1
           await client.from('gallery_images').insert({
             gallery_id: route.params.id,
             cloudinary_id: result.info.public_id,
-            url: result.info.secure_url
+            url: result.info.secure_url,
+            position: nextPosition
           })
 
           // Refresh gallery
@@ -134,42 +139,68 @@ async function deleteImage(image) {
     alert('Delete failed')
   }
 }
+
+// Drag-and-drop reordering
+const orderedImages = ref([])
+
+watch(
+  () => gallery.value?.gallery_images || [],
+  (imgs) => {
+    orderedImages.value = Array.isArray(imgs) ? [...imgs] : []
+  },
+  { immediate: true }
+)
+
+async function saveOrder() {
+  if (!orderedImages.value?.length) return
+  const galleryId = route.params.id
+  const payload = orderedImages.value
+    .filter((img) => !!img?.id)
+    .map((img, idx) => ({ id: img.id, position: idx + 1 }))
+
+  const { error } = await client.rpc('update_gallery_positions', {
+    payload,
+    p_gallery_id: galleryId
+  })
+  if (error) {
+    console.error('Failed to save order', error)
+    toast.add({ title: 'Save failed', description: error.message || 'Failed to save new order', color: 'error' })
+    return
+  }
+  // Optimistically keep local order, then refresh from server
+  if (gallery.value) {
+    gallery.value.gallery_images = [...orderedImages.value]
+  }
+  await refresh()
+  toast.add({ title: 'Order saved', color: 'success' })
+}
 </script>
 
 <template>
-  <div>
-    <div class="flex items-center justify-between mb-4">
-      <h1 class="text-2xl font-semibold">{{ gallery?.title }}</h1>
-      <!-- Upload Button -->
-      <UButton
-        @click="openUploadWidget"
-        :disabled="!cloudinaryLoaded"
-        class="upload-btn"
-      >
+  <admin-inner-wrapper :title="gallery?.title" description="Manage photos in this gallery" v-if="gallery">
+    <!-- Image Grid with Drag-and-Drop -->
+    <Draggable v-model="orderedImages" item-key="id" class="image-grid" handle=".drag-handle" @end="saveOrder">
+      <template #item="{ element }">
+        <div class="image-card">
+          <div class="drag-handle" title="Drag to reorder">⋮⋮</div>
+          <img :src="element.url" :alt="gallery.title">
+          <UButton @click="deleteImage(element)" color="error" class="absolute top-2 right-2">
+            Remove
+          </UButton>
+        </div>
+      </template>
+    </Draggable>
+
+    <div class="space-y-2">
+      <UEmpty v-if="!gallery?.gallery_images?.length" title="No images in this gallery yet."
+        description="It looks like you haven't added any images. Click 'Upload Images' to get started." />
+      <UButton @click="openUploadWidget" :disabled="!cloudinaryLoaded" size="xl">
         {{ cloudinaryLoaded ? 'Upload Images' : 'Loading...' }}
       </UButton>
     </div>
 
-    <!-- Image Grid -->
-    <div class="image-grid">
-      <div
-        v-for="image in gallery?.gallery_images"
-        :key="image.id"
-        class="image-card"
-      >
-        <img :src="image.url" :alt="gallery.title">
-        <button @click="deleteImage(image)" class="delete-btn">
-          Delete
-        </button>
-      </div>
-    </div>
-
-    <p v-if="!gallery?.gallery_images?.length">
-      No images yet. Click "Upload Images" to add some!
-    </p>
-
     <NuxtLink to="/admin/galleries">← Back to Galleries</NuxtLink>
-  </div>
+  </admin-inner-wrapper>
 </template>
 
 <style scoped>
@@ -204,7 +235,7 @@ async function deleteImage(image) {
   position: relative;
   border-radius: 8px;
   overflow: hidden;
-  box-shadow: 0 2px 8px rgba(0,0,0,0.1);
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
 }
 
 .image-card img {
@@ -214,21 +245,15 @@ async function deleteImage(image) {
   display: block;
 }
 
-.delete-btn {
+.drag-handle {
   position: absolute;
+  left: 10px;
   top: 10px;
-  right: 10px;
-  background: rgba(244, 67, 54, 0.9);
-  color: white;
-  border: none;
-  padding: 8px 16px;
+  cursor: grab;
+  background: rgba(0, 0, 0, 0.4);
+  color: #fff;
+  padding: 4px 8px;
   border-radius: 4px;
-  cursor: pointer;
-  font-size: 14px;
-  font-weight: 600;
-}
-
-.delete-btn:hover {
-  background: rgba(244, 67, 54, 1);
+  font-weight: 700;
 }
 </style>

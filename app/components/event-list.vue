@@ -1,4 +1,4 @@
-<script setup lang="ts">
+<script setup>
   const client = useSupabaseClient()
 
   const fetchEvents = async () => {
@@ -18,18 +18,18 @@
   })
 </script>
 <template>
-  <UPageList class="flex-1">
-    <h2 class="font-semibold mb-2">Existing Events</h2>
-    <UPageCard
-      v-for="event in savedEvents"
-      :key="event.id"
-      variant="ghost"
-      :to="`/admin/events/${event.id}`"
-    >
-      <template #body>
-        <h2 class="text-lg font-semibold mb-2">{{ event.title }} - {{ new Date(event.date).toLocaleDateString() }}</h2>
-        <p>{{ event.description }}</p>
-      </template>
-    </UPageCard>
-  </UPageList>
+  <div>
+    <UPageGrid class="flex-1">
+      <UPageCard
+        v-for="event in savedEvents"
+        :key="event.id"
+        :to="`/admin/events/${event.id}`"
+      >
+        <template #body>
+          <h2 class="text-lg font-semibold mb-2">{{ event.title }} - {{ new Date(event.date).toLocaleDateString() }}</h2>
+          <p>{{ event.description }}</p>
+        </template>
+      </UPageCard>
+    </UPageGrid>
+  </div>
 </template>

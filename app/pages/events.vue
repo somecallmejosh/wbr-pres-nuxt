@@ -1,11 +1,11 @@
 <script setup lang="ts">
-  const user = useSupabaseUser()
+const user = useSupabaseUser()
 </script>
 <template>
-  <UPageSection>
+  <page-wrapper title="Events" description="Upcoming events at WBR Presbyterian Church">
     <EventList />
-    <div v-if="user" >
+    <div v-if="user">
       <UButton href="/admin/events/create">Create New Event</UButton>
     </div>
-  </UPageSection>
+  </page-wrapper>
 </template>

@@ -18,14 +18,21 @@ onMounted(async () => {
   const fetchedEvent = await getEvent(eventId)
   event.value = fetchedEvent
 })
+
+const links = [
+  { label: '← All Events', to: '/admin/events' },
+  { label: 'Edit this Event', to: `/admin/events/${eventId}/edit` }
+]
 </script>
 
 
 
 <template>
-  <div v-if="event">
-    <h1 class="font-semibold text-xl">{{ event?.title }}</h1>
-    <p>{{ event?.description }}</p>
-    <p>{{ new Date(event?.date).toLocaleDateString() }}</p>
-  </div>
+  <admin-inner-wrapper :title="event.title"v-if="event">
+    <div>
+      <p>{{ event?.description }}</p>
+      <p>{{ new Date(event?.date).toLocaleDateString() }}</p>
+    </div>
+    <admin-wrapper-links :links="links" />
+  </admin-inner-wrapper>
 </template>

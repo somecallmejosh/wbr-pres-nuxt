@@ -2,6 +2,7 @@
 <script setup>
 const route = useRoute()
 const client = useSupabaseClient()
+const user = useSupabaseUser()
 
 // Fetch gallery with images (no auth needed - public!)
 const { data: gallery } = await useAsyncData('public-gallery', async () => {
@@ -37,51 +38,35 @@ function closeLightbox() {
 </script>
 
 <template>
-  <UPageSection>
-    <UPageCard>
-      <header>
-        <h1>{{ gallery.title }}</h1>
-        <UButton to="/galleries">
-          ← All Galleries
-        </UButton>
-        <UButton :to="`/admin/galleries/${gallery.id}`">
-          Edit this Gallery
-        </UButton>
-      </header>
-      <!-- Image Grid -->
-      <div v-if="gallery.gallery_images?.length" class="image-grid">
-        <div
-          v-for="image in gallery.gallery_images"
-          :key="image.id"
-          class="image-card"
-          @click="openLightbox(image)"
-        >
-          <img
-            :src="image.url"
-            :alt="`${gallery.title} image`"
-            loading="lazy"
-          >
-        </div>
+  <page-wrapper :title="gallery.title" :description="`View images from the ${gallery.title} gallery.`">
+    <!-- Image Grid -->
+    <div v-if="gallery.gallery_images?.length" class="image-grid">
+      <div v-for="image in gallery.gallery_images" :key="image.id" class="image-card" @click="openLightbox(image)">
+        <img :src="image.url" :alt="`${gallery.title} image`" loading="lazy">
       </div>
-      <!-- Empty State -->
-      <div v-else class="empty-state">
-        <p>No images in this gallery yet.</p>
-      </div>
-      <!-- Lightbox Modal -->
-      <div
-        v-if="selectedImage"
-        class="lightbox"
-        @click="closeLightbox"
-      >
-        <button class="close-btn" @click="closeLightbox">×</button>
-        <img
-          :src="selectedImage.url"
-          :alt="`${gallery.title} image`"
-          @click.stop
-        >
-      </div>
-    </UPageCard>
-  </UPageSection>
+    </div>
+    <!-- Empty State -->
+    <div v-else class="empty-state">
+       <UEmpty
+        title="No images in this gallery yet."
+        description="It looks like you haven't added any images. Add some to get started."
+      />
+    </div>
+    <!-- Lightbox Modal -->
+    <div v-if="selectedImage" class="lightbox" @click="closeLightbox">
+      <button class="close-btn" @click="closeLightbox">×</button>
+      <img :src="selectedImage.url" :alt="`${gallery.title} image`" @click.stop>
+    </div>
+
+    <div class="flex items-center justify-between gap-1">
+      <UButton to="/galleries" variant="outline">
+        ← All Galleries
+      </UButton>
+      <UButton v-if="user" :to="`/admin/galleries/${gallery.id}`">
+        Edit this Gallery
+      </UButton>
+    </div>
+  </page-wrapper>
 </template>
 
 <style scoped>
@@ -126,13 +111,13 @@ h1 {
   cursor: pointer;
   border-radius: 8px;
   overflow: hidden;
-  box-shadow: 0 2px 8px rgba(0,0,0,0.1);
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
   transition: transform 0.2s, box-shadow 0.2s;
 }
 
 .image-card:hover {
   transform: translateY(-4px);
-  box-shadow: 0 4px 16px rgba(0,0,0,0.2);
+  box-shadow: 0 4px 16px rgba(0, 0, 0, 0.2);
 }
 
 .image-card img {
