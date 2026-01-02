@@ -1,0 +1,22 @@
+{
+  "name": "wbr-pres-church",
+  "type": "module",
+  "private": true,
+  "scripts": {
+    "build": "nuxt build",
+    "dev": "nuxt dev",
+    "generate": "nuxt generate",
+    "preview": "nuxt preview",
+    "postinstall": "nuxt prepare"
+  },
+  "dependencies": {
+    "@nuxt/ui": "^4.3.0",
+    "@nuxtjs/supabase": "^2.0.3",
+    "cloudinary": "^2.8.0",
+    "nuxt": "^4.2.2",
+    "nuxt-auth-utils": "^0.5.26",
+    "typescript": "^5.9.3",
+    "vue": "^3.5.26",
+    "vue-router": "^4.6.4"
+  }
+}
