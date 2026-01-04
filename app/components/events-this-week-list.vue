@@ -1,13 +1,15 @@
 <script setup>
-  import { normalizeDate } from '~/utilities/date-format'
+  import { normalizeDate, getCurrentWeekRange } from '~/utilities/date-format'
   const client = useSupabaseClient()
 
   const fetchEvents = async () => {
+    const { startYmd, endYmd } = getCurrentWeekRange({ startOnMonday: false })
     const { data: events } = await client
-    .from('events')
-    .select('*')
-    .order('date', { ascending: true })
-
+      .from('events')
+      .select('*')
+      .gte('date', startYmd)
+      .lte('date', endYmd)
+      .order('date', { ascending: true })
     return events
   }
 
@@ -20,7 +22,8 @@
 
 </script>
 <template>
-  <div class="@container">
+  <div v-if="savedEvents.length > 0" class="@container">
+    <USeparator label="Events This Week" color="primary" label-alignment="left" class="my-8" />
     <ul class="grid @xs:grid-cols-2 @lg:grid-cols-3 gap-6">
       <li v-for="event in savedEvents"
           :key="event.id" class="relative bg-white p-4">
@@ -44,4 +47,5 @@
       </li>
     </ul>
   </div>
+  <UEmpty v-else title="No events this week" />
 </template>

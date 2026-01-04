@@ -41,11 +41,15 @@ const items = [
   <UApp>
     <UHeader>
       <template #title>
-        <div>WBR Presbyterian Church</div>
+        <div>
+          <NuxtLink to="/" class="text-lg font-bold flex items-center gap-2" aria-label="Home page">
+            <img src="https://res.cloudinary.com/dwjulenau/image/upload/v1765035098/WBR%20Presbyterian/logo.png"  alt="WBR Presbyterian Church Logo" class="size-12" />
+            <span class="font-display flex gap-1"><span class="hidden">WBR Presbyterian</span> Church</span>
+          </NuxtLink>
+        </div>
       </template>
       <UNavigationMenu :items="items" />
       <template #right>
-        <UColorModeButton />
         <UButton v-if="user" variant="link" :to="{ path: '/admin' }">Admin</UButton>
         <UButton v-if="user" @click="logout">
           Logout

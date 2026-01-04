@@ -1,5 +1,6 @@
 <script setup lang="ts">
 const route = useRoute()
+import { normalizeDate } from '~/utilities/date-format'
 const memberId = route.params.id as string
 const client = useSupabaseClient()
 
@@ -29,7 +30,7 @@ const links = [
 
 <template>
   <admin-inner-wrapper :title="member.name" v-if="member">
-    <p>{{ new Date(member?.birth_date).toLocaleDateString() }}</p>
+    <p>{{ new Date(normalizeDate(member?.birth_date)).toLocaleDateString() }}</p>
 
     <admin-wrapper-links :links="links" />
   </admin-inner-wrapper>

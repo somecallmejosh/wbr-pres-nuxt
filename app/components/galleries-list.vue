@@ -23,7 +23,7 @@ onMounted(async () => {
 </script>
 <template>
   <UPageGrid class="flex-1">
-    <UPageCard v-for="gallery in savedgalleries" :key="gallery.id" :to="`/admin/galleries/${gallery.id}`">
+    <UPageCard variant="soft" v-for="gallery in savedgalleries" :key="gallery.id" :to="`/admin/galleries/${gallery.id}`">
       <template #body>
         <img v-if="gallery.gallery_images && gallery.gallery_images[0]" :src="gallery.gallery_images[0].url"
           :alt="gallery.title" class="w-full aspect-video object-cover rounded mb-2">

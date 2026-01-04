@@ -3,7 +3,7 @@ export default defineNuxtConfig({
   srcDir: 'app',
   compatibilityDate: '2025-07-15',
   devtools: { enabled: true },
-  modules: ['@nuxt/ui','@nuxtjs/supabase'],
+  modules: ['@nuxt/ui', '@nuxtjs/supabase', '@nuxt/fonts'],
   css: ['~/assets/css/main.css'],
   runtimeConfig: {
     cloudinary: {
@@ -27,4 +27,7 @@ export default defineNuxtConfig({
       exclude: ['/', '/events', '/about', '/contact', '/galleries', '/galleries/*']
     }
   },
+  ui: {
+    colorMode: false
+  }
 })

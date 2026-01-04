@@ -9,11 +9,13 @@ export default defineAppConfig({
       }
     },
     colors: {
-      primary: 'sky',
-      gray: 'slate'
+      primary: 'yellow',
+      secondary: 'amber',
+      gray: 'stone'
     },
     container: {
       base: 'w-full max-w-(--ui-container) mx-auto px-4 sm:px-6 lg:px-8'
-    }
+    },
+
   }
 })
